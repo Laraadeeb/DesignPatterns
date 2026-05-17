@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetHome - Pet Details</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .pet-details-header { text-align:center; margin-bottom:30px; }
+    .pet-details-emoji { font-size:5rem; display:block; margin-bottom:10px; }
+    .pet-details-header h1 { color:#FFC0CB; margin:0; }
+    .pet-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:24px 0; }
+    .pet-info-item { background:#fef5f1; border-radius:10px; padding:14px 18px; border-left:4px solid #FFC0CB; }
+    .info-label { font-size:0.8rem; color:#999; text-transform:uppercase; display:block; margin-bottom:4px; }
+    .info-value { font-weight:bold; color:#333; font-size:1rem; }
+    .pet-description { background:#fef5f1; border-radius:10px; padding:20px; margin:20px 0; color:#555; line-height:1.7; }
+    .pet-description h3 { color:#FFC0CB; margin-top:0; }
+    .adopt-section { text-align:center; margin-top:30px; padding:24px; background:linear-gradient(135deg,#fff0f5,#fef5f1); border-radius:12px; border:2px dashed #FFC0CB; }
+    .adopt-section p { color:#666; margin-bottom:12px; }
+    .adopt-textarea { width:100%; padding:12px; border:1.5px solid #ddd; border-radius:8px; font-size:0.95rem; min-height:80px; box-sizing:border-box; margin-bottom:14px; resize:vertical; font-family:inherit; }
+    .status-badge { display:inline-block; padding:6px 18px; border-radius:20px; font-size:0.85rem; font-weight:bold; margin-top:8px; }
+    .status-available { background:#e6f9ee; color:#27ae60; }
+    .status-adopted { background:#ffeaea; color:#e74c3c; }
+    .success-msg { display:none; background:#e6f9ee; border:2px solid #27ae60; color:#27ae60; padding:16px; border-radius:10px; font-weight:bold; margin-top:16px; }
+    .error-msg-box { display:none; background:#ffeaea; border:2px solid #e74c3c; color:#e74c3c; padding:16px; border-radius:10px; font-weight:bold; margin-top:16px; }
+    @media(max-width:600px){ .pet-info-grid{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="logo"><img src="logo.png" alt="logo"> PetHome</div>
+    <nav id="main-nav"></nav>
+  </header>
+
+  <main>
+    <a href="index.html" class="back-link">← Back to Pets</a>
+    <div class="job-details-container" id="petDetailsContainer">
+      <p style="text-align:center; padding:40px; color:#aaa;">Loading pet details... 🐾</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>🐾 &copy; 2025 PetHome. All rights reserved.</p>
+  </footer>
+
+  <script src="navbar.js"></script>
+  <script>
+    renderNav('main-nav');
+
+    const emojiMap = { dog:'🐶', cat:'🐱', rabbit:'🐰', bird:'🐦', small:'🐹' };
+    const petId = new URLSearchParams(window.location.search).get('id');
+    const container = document.getElementById('petDetailsContainer');
+
+    // ── جيب بيانات الـ pet من الـ backend ──
+    async function loadPet() {
+      try {
+        const res = await fetch('http://localhost:3000/api/pets/' + petId);
+        if (!res.ok) throw new Error('Pet not found');
+        const pet = await res.json();
+        renderPet(pet);
+      } catch (err) {
+        container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">🐾 Pet not found. <a href="index.html">Go back.</a></p>';
+      }
+    }
+
+    function renderPet(pet) {
+      document.title = 'PetHome - ' + pet.name;
+      const emoji = emojiMap[pet.type] || '🐾';
+
+      // تحقق من الـ login state هنا مباشرة
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      let adoptSection = '';
+
+      if (pet.status !== 'available') {
+        adoptSection = `
+          <div class="adopt-section">
+            <p>❤️ ${pet.name} has already found a loving home!</p>
+            <a href="index.html"><button style="width:auto;padding:12px 30px;">Browse More Pets</button></a>
+          </div>`;
+
+      } else if (!token || !user) {
+        // مش logged in
+        adoptSection = `
+          <div class="adopt-section">
+            <p>Ready to give <strong>${pet.name}</strong> a forever home? 🏠</p>
+            <p style="color:#e74c3c;font-weight:bold;">Please login first to send an adoption request.</p>
+            <button onclick="window.location.href='login.html'" style="width:auto;padding:12px 30px;">Login to Adopt</button>
+          </div>`;
+
+      } else if (user.role === 'shelter' || user.role === 'rescuer') {
+        // shelter مش بيتبنى
+        adoptSection = `
+          <div class="adopt-section">
+            <p>You are logged in as a Shelter. Only adopter accounts can send adoption requests.</p>
+          </div>`;
+
+      } else {
+        // adopter logged in ✅
+        adoptSection = `
+          <div class="adopt-section">
+            <p>Ready to give <strong>${pet.name}</strong> a forever home? 🏠</p>
+            <textarea class="adopt-textarea" id="adoptMsg"
+              placeholder="Tell the shelter a bit about yourself and why you'd like to adopt ${pet.name}..."></textarea>
+            <button id="adoptBtn" onclick="sendRequest(${pet.id})" style="width:auto;padding:12px 36px;">
+              🐾 Request to Adopt ${pet.name}
+            </button>
+            <div class="success-msg" id="successMsg">
+              🎉 Your adoption request has been sent! The shelter will contact you soon.
+            </div>
+            <div class="error-msg-box" id="errorMsgBox"></div>
+          </div>`;
+      }
+
+      container.innerHTML = `
+        <div class="pet-details-header">
+          ${pet.image_url
+          ? `<img src="http://localhost:3000${pet.image_url}" style="width:200px;height:200px;border-radius:16px;object-fit:cover;margin-bottom:10px;">`
+          : `<span class="pet-details-emoji">${emoji}</span>`}
+          <h1>${pet.name}</h1>
+          <span class="status-badge status-${pet.status}">
+            ${pet.status === 'available' ? '✅ Available for Adoption' : '❤️ Already Adopted'}
+          </span>
+        </div>
+        <hr>
+        <div class="pet-info-grid">
+          <div class="pet-info-item"><span class="info-label">Breed</span><span class="info-value">${pet.breed || '—'}</span></div>
+          <div class="pet-info-item"><span class="info-label">Gender</span><span class="info-value">${pet.gender || '—'}</span></div>
+          <div class="pet-info-item"><span class="info-label">Age</span><span class="info-value">${pet.age || '—'}</span></div>
+          <div class="pet-info-item"><span class="info-label">Health</span><span class="info-value">${pet.health_status || '—'}</span></div>
+          <div class="pet-info-item"><span class="info-label">Shelter</span><span class="info-value">${pet.shelter_name || '—'}</span></div>
+          <div class="pet-info-item"><span class="info-label">Location</span><span class="info-value">${pet.location || '—'}</span></div>
+        </div>
+        ${pet.description ? `<div class="pet-description"><h3>About ${pet.name}</h3><p>${pet.description}</p></div>` : ''}
+        ${adoptSection}
+      `;
+    }
+
+    async function sendRequest(petId) {
+      const token = localStorage.getItem('token');
+      const message = document.getElementById('adoptMsg').value || '';
+      const btn = document.getElementById('adoptBtn');
+      const successMsg = document.getElementById('successMsg');
+      const errorBox = document.getElementById('errorMsgBox');
+
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+      errorBox.style.display = 'none';
+
+      try {
+        const res = await fetch('http://localhost:3000/api/requests', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ pet_id: petId, message: message })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Request failed');
+
+        successMsg.style.display = 'block';
+        btn.style.display = 'none';
+
+      } catch (err) {
+        errorBox.textContent = '❌ ' + err.message;
+        errorBox.style.display = 'block';
+        btn.textContent = '🐾 Request to Adopt';
+        btn.disabled = false;
+      }
+    }
+
+    loadPet();
+  </script>
+</body>
+</html>

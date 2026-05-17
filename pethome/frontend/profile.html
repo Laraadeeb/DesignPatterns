@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetHome - My Profile</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .profile-card { background:white; border-radius:16px; padding:40px; max-width:600px; margin:0 auto; box-shadow:0 4px 20px rgba(0,0,0,0.08); }
+    .profile-avatar { width:90px; height:90px; border-radius:50%; background:#FFC0CB; display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin:0 auto 20px; }
+    .profile-name { text-align:center; font-size:1.6rem; font-weight:bold; color:#1E293B; margin-bottom:4px; }
+    .profile-role { text-align:center; color:#FFC0CB; font-weight:bold; margin-bottom:24px; font-size:1rem; }
+    .profile-info { background:#fef5f1; border-radius:10px; padding:20px; margin-bottom:20px; }
+    .profile-info-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #f0e0e8; }
+    .profile-info-row:last-child { border-bottom:none; }
+    .info-key { color:#999; font-size:0.9rem; }
+    .info-val { font-weight:bold; color:#333; }
+    .logout-btn { display:block; width:100%; background:#1E293B; color:white; border:none; padding:14px; border-radius:25px; font-size:1.1rem; font-weight:bold; cursor:pointer; margin-top:10px; transition:background 0.2s; }
+    .logout-btn:hover { background:#e74c3c; }
+    .requests-section { margin-top:30px; }
+    .request-card { background:white; border-radius:10px; padding:16px 20px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-left:4px solid #FFC0CB; display:flex; justify-content:space-between; align-items:center; }
+    .req-status { padding:4px 14px; border-radius:20px; font-size:0.8rem; font-weight:bold; }
+    .req-status.pending { background:#fff3cd; color:#856404; }
+    .req-status.approved { background:#e6f9ee; color:#27ae60; }
+    .req-status.rejected { background:#ffeaea; color:#e74c3c; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><img src="logo.png" alt="logo"> PetHome</div>
+    <nav id="main-nav"></nav>
+  </header>
+
+  <main style="max-width:700px; margin:0 auto; padding:2rem;">
+    <a href="index.html" class="back-link">← Back to Home</a>
+
+    <div class="profile-card" id="profileCard">
+      <p style="text-align:center; color:#aaa;">Loading profile...</p>
+    </div>
+
+    <div class="requests-section" id="requestsSection" style="display:none;">
+      <h2 style="color:#1E293B; margin-bottom:16px;">📋 My Adoption Requests</h2>
+      <div id="requestsList"></div>
+    </div>
+  </main>
+
+  <footer><p>🐾 &copy; 2025 PetHome. All rights reserved.</p></footer>
+
+  <script src="navbar.js"></script>
+  <script>
+    renderNav('main-nav');
+
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    if (!user) window.location.href = 'login.html';
+
+    const roleLabel = { adopter: '🐾 Adopter', shelter: '🏠 Shelter', rescuer: '🐕 Rescuer', admin: '⚙️ Admin' };
+
+    document.getElementById('profileCard').innerHTML = `
+      <div class="profile-avatar">👤</div>
+      <div class="profile-name">${user.first_name} ${user.last_name}</div>
+      <div class="profile-role">${roleLabel[user.role] || user.role}</div>
+      <div class="profile-info">
+        <div class="profile-info-row"><span class="info-key">Email</span><span class="info-val">${user.email}</span></div>
+        <div class="profile-info-row"><span class="info-key">Role</span><span class="info-val">${roleLabel[user.role]}</span></div>
+        <div class="profile-info-row"><span class="info-key">Member since</span><span class="info-val">2025</span></div>
+      </div>
+      ${user.role === 'shelter' || user.role === 'rescuer'
+        ? `<a href="dashboard.html"><button style="width:100%;margin-bottom:10px;">🏠 Go to Dashboard</button></a>`
+        : ''}
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    `;
+
+    // Load requests for adopters
+    if (user.role === 'adopter') {
+      loadRequests();
+    }
+
+    async function loadRequests() {
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch('http://localhost:3000/api/requests', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const requests = await res.json();
+        const section = document.getElementById('requestsSection');
+        const list = document.getElementById('requestsList');
+
+        if (requests.length === 0) {
+          list.innerHTML = '<p style="color:#aaa; text-align:center; padding:20px;">No adoption requests yet. <a href="index.html">Browse pets!</a></p>';
+        } else {
+          list.innerHTML = requests.map(r => `
+            <div class="request-card">
+              <div>
+                <strong>${r.pet_name}</strong>
+                <p style="margin:4px 0 0; color:#888; font-size:0.85rem;">${new Date(r.created_at).toLocaleDateString()}</p>
+              </div>
+              <span class="req-status ${r.status}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span>
+            </div>
+          `).join('');
+        }
+        section.style.display = 'block';
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>

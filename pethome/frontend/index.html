@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetHome - Find Your Perfect Pet</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="logo"><img src="logo.png" alt="logo"> PetHome</div>
+    <nav id="main-nav"></nav>
+  </header>
+
+  <main>
+    <section class="PetHome">
+      <div class="PetHome-overlay">
+        <div class="PetHome-center">
+          <h1>Give a Pet a Forever Home</h1>
+          <p>Thousands of loving animals are waiting to meet you. Find your perfect companion today.</p>
+          <div class="PetHome-search-box">
+            <input type="text" id="searchInput" placeholder="Search pets (e.g. Golden Retriever, Kitten...)" autocomplete="off">
+            <button onclick="applyFilters()">Find Pets</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="filter-section">
+      <div class="filter-tabs">
+        <button class="filter-btn active" data-filter="all">All Pets</button>
+        <button class="filter-btn" data-filter="dog">🐶 Dogs</button>
+        <button class="filter-btn" data-filter="cat">🐱 Cats</button>
+        <button class="filter-btn" data-filter="rabbit">🐰 Rabbits</button>
+        <button class="filter-btn" data-filter="bird">🐦 Birds</button>
+        <button class="filter-btn" data-filter="small">🐹 Small Pets</button>
+      </div>
+    </section>
+
+    <h1>Our Partner Shelters</h1>
+    <section class="companies-section">
+      <div class="container">
+        <div class="companies-carousel">
+          <div class="carousel-track">
+            <div class="shelter-badge">🏠 Happy Paws Shelter</div>
+            <div class="shelter-badge">🐾 Cairo Animal Rescue</div>
+            <div class="shelter-badge">❤️ Second Chance Shelter</div>
+            <div class="shelter-badge">🌟 Forever Friends</div>
+            <div class="shelter-badge">🐕 Paws & Claws Egypt</div>
+            <div class="shelter-badge">🐈 Feline Friends Cairo</div>
+            <div class="shelter-badge">🌈 Rainbow Rescue</div>
+            <div class="shelter-badge">🏡 Safe Haven Shelter</div>
+            <div class="shelter-badge">💛 Animal Love Society</div>
+            <div class="shelter-badge">🐾 Adopt Don't Shop</div>
+            <div class="shelter-badge">🏠 Happy Paws Shelter</div>
+            <div class="shelter-badge">🐾 Cairo Animal Rescue</div>
+            <div class="shelter-badge">❤️ Second Chance Shelter</div>
+            <div class="shelter-badge">🌟 Forever Friends</div>
+            <div class="shelter-badge">🐕 Paws & Claws Egypt</div>
+            <div class="shelter-badge">🐈 Feline Friends Cairo</div>
+            <div class="shelter-badge">🌈 Rainbow Rescue</div>
+            <div class="shelter-badge">🏡 Safe Haven Shelter</div>
+            <div class="shelter-badge">💛 Animal Love Society</div>
+            <div class="shelter-badge">🐾 Adopt Don't Shop</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-section">
+      <div class="stat-item"><span class="stat-number" id="stat-pets">...</span><span class="stat-label">Pets Available</span></div>
+      <div class="stat-item"><span class="stat-number">10,000+</span><span class="stat-label">Happy Adoptions</span></div>
+      <div class="stat-item"><span class="stat-number">50+</span><span class="stat-label">Partner Shelters</span></div>
+      <div class="stat-item"><span class="stat-number">12</span><span class="stat-label">Cities Covered</span></div>
+    </section>
+
+    <h1>Pets Looking for a Home</h1>
+
+    <div id="no-results" class="no-results" style="display:none;">
+      <p>🐾 No pets found. Try a different search!</p>
+    </div>
+
+    <div class="jobs-container" id="petsContainer">
+      <p style="text-align:center; color:#aaa; padding:40px; grid-column:1/-1;">Loading pets... 🐾</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>🐾 &copy; 2025 PetHome. All rights reserved. Every pet deserves a loving home.</p>
+  </footer>
+
+  <script src="navbar.js"></script>
+  <script>
+    renderNav('main-nav');
+
+    const emojiMap = { dog:'🐶', cat:'🐱', rabbit:'🐰', bird:'🐦', small:'🐹' };
+    let allPets = [];
+    let activeFilter = 'all';
+
+    // ── FETCH PETS FROM BACKEND ──
+    async function loadPets() {
+      try {
+        const res = await fetch('http://localhost:3000/api/pets?status=available');
+        allPets = await res.json();
+        document.getElementById('stat-pets').textContent = allPets.length + '+';
+        applyFilters();
+      } catch (err) {
+        document.getElementById('petsContainer').innerHTML =
+          '<p style="text-align:center;color:#e74c3c;padding:40px;grid-column:1/-1;">❌ Could not load pets. Make sure the server is running.</p>';
+      }
+    }
+
+    function renderPets(pets) {
+      const container = document.getElementById('petsContainer');
+      const noResults = document.getElementById('no-results');
+
+      if (pets.length === 0) {
+        container.innerHTML = '';
+        noResults.style.display = 'block';
+        return;
+      }
+      noResults.style.display = 'none';
+      container.innerHTML = pets.map(pet => `
+        <div class="job-card" onclick="window.location.href='pet-details.html?id=${pet.id}'" style="cursor:pointer;">
+          <div class="pet-emoji">
+          ${pet.image_url
+          ? `<img src="http://localhost:3000${pet.image_url}" style="width:80px;height:80px;border-radius:10px;object-fit:cover;">`
+          : emojiMap[pet.type] || '🐾'}
+          </div>
+          <h3>${pet.name}</h3>
+          <p class="pet-breed">${pet.breed || pet.type} • ${pet.gender || 'Unknown'} • ${pet.age || 'Unknown'}</p>
+          <p class="company">${pet.shelter_name || 'Shelter'}</p>
+          <p class="details">${pet.location || 'Egypt'} • ${pet.health_status || 'Healthy'} ✓</p>
+          <button>Meet ${pet.name}</button>
+        </div>
+      `).join('');
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const filtered = allPets.filter(pet => {
+        const matchFilter = activeFilter === 'all' || pet.type === activeFilter;
+        const matchSearch = !search ||
+          pet.name.toLowerCase().includes(search) ||
+          (pet.breed || '').toLowerCase().includes(search) ||
+          (pet.shelter_name || '').toLowerCase().includes(search);
+        return matchFilter && matchSearch;
+      });
+      renderPets(filtered);
+    }
+
+    // ── FILTER BUTTONS ──
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(function(b) {
+          b.classList.remove('active');
+        });
+        this.classList.add('active');
+        activeFilter = this.getAttribute('data-filter');
+        applyFilters();
+      });
+    });
+
+    // ── LIVE SEARCH ──
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+    loadPets();
+  </script>
+</body>
+</html>

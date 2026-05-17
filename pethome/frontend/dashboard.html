@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetHome - Shelter Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .dashboard-tabs { display:flex; gap:12px; margin-bottom:30px; flex-wrap:wrap; }
+    .tab-btn { background:#1E293B; color:#E2E8F0; padding:10px 24px; border-radius:25px; border:none; cursor:pointer; font-weight:bold; font-size:0.95rem; transition:all 0.2s; }
+    .tab-btn.active, .tab-btn:hover { background:#FFC0CB; color:white; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    .add-pet-form { background:white; padding:30px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.08); max-width:600px; }
+    .add-pet-form h2 { color:#FFC0CB; margin-top:0; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    select.form-input { width:100%; padding:12px 14px; border:1.5px solid #ddd; border-radius:8px; font-size:1rem; background:#fafafa; box-sizing:border-box; }
+    textarea.form-input { width:100%; padding:12px 14px; border:1.5px solid #ddd; border-radius:8px; font-size:1rem; background:#fafafa; box-sizing:border-box; min-height:80px; resize:vertical; }
+    .pet-manage-card { background:white; border-radius:10px; padding:16px 20px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-left:4px solid #FFC0CB; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+    .pet-manage-info h4 { margin:0 0 4px; color:#1E293B; }
+    .pet-manage-info p { margin:0; color:#888; font-size:0.85rem; }
+    .pet-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .btn-sm { padding:6px 16px; border-radius:20px; border:none; cursor:pointer; font-weight:bold; font-size:0.85rem; width:auto; }
+    .btn-delete { background:#ffeaea; color:#e74c3c; }
+    .btn-delete:hover { background:#e74c3c; color:white; }
+    .btn-adopted { background:#e6f9ee; color:#27ae60; }
+    .btn-adopted:hover { background:#27ae60; color:white; }
+    .request-card { background:white; border-radius:10px; padding:16px 20px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-left:4px solid #FFC0CB; }
+    .req-actions { display:flex; gap:8px; margin-top:10px; }
+    .btn-approve { background:#e6f9ee; color:#27ae60; padding:8px 20px; border-radius:20px; border:none; cursor:pointer; font-weight:bold; width:auto; }
+    .btn-approve:hover { background:#27ae60; color:white; }
+    .btn-reject { background:#ffeaea; color:#e74c3c; padding:8px 20px; border-radius:20px; border:none; cursor:pointer; font-weight:bold; width:auto; }
+    .btn-reject:hover { background:#e74c3c; color:white; }
+    .req-status { display:inline-block; padding:4px 14px; border-radius:20px; font-size:0.8rem; font-weight:bold; }
+    .req-status.pending { background:#fff3cd; color:#856404; }
+    .req-status.approved { background:#e6f9ee; color:#27ae60; }
+    .req-status.rejected { background:#ffeaea; color:#e74c3c; }
+    .success-toast { display:none; background:#e6f9ee; color:#27ae60; padding:12px 20px; border-radius:8px; font-weight:bold; margin-bottom:16px; border:1.5px solid #27ae60; }
+    .error-toast { display:none; background:#ffeaea; color:#e74c3c; padding:12px 20px; border-radius:8px; font-weight:bold; margin-bottom:16px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><img src="logo.png" alt="logo"> PetHome</div>
+    <nav id="main-nav"></nav>
+  </header>
+
+  <main>
+    <h1 style="color:#1E293B; text-align:left; margin-bottom:8px;">🏠 Shelter Dashboard</h1>
+    <p style="color:#888; margin-bottom:24px;" id="welcomeMsg"></p>
+
+    <div class="dashboard-tabs">
+      <button class="tab-btn active" onclick="switchTab('my-pets')">🐾 My Pets</button>
+      <button class="tab-btn" onclick="switchTab('add-pet')">➕ Add Pet</button>
+      <button class="tab-btn" onclick="switchTab('requests')">📋 Adoption Requests <span id="pendingBadge"></span></button>
+    </div>
+
+    <!-- MY PETS TAB -->
+    <div class="tab-content active" id="tab-my-pets">
+      <div id="myPetsList"><p style="color:#aaa;">Loading your pets...</p></div>
+    </div>
+
+    <!-- ADD PET TAB -->
+    <div class="tab-content" id="tab-add-pet">
+      <div class="add-pet-form">
+        <h2>➕ Add New Pet</h2>
+        <div id="addSuccess" class="success-toast">✅ Pet added successfully!</div>
+        <div id="addError" class="error-toast"></div>
+
+        <div class="form-group">
+          <label>Pet Name</label>
+          <input type="text" id="petName" placeholder="e.g. Buddy" class="form-input" style="width:100%;box-sizing:border-box;">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Type</label>
+            <select id="petType" class="form-input">
+              <option value="dog">🐶 Dog</option>
+              <option value="cat">🐱 Cat</option>
+              <option value="rabbit">🐰 Rabbit</option>
+              <option value="bird">🐦 Bird</option>
+              <option value="small">🐹 Small Pet</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="petGender" class="form-input">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Breed</label>
+            <input type="text" id="petBreed" placeholder="e.g. Golden Retriever" class="form-input" style="width:100%;box-sizing:border-box;">
+          </div>
+          <div class="form-group">
+            <label>Age</label>
+            <input type="text" id="petAge" placeholder="e.g. 2 years" class="form-input" style="width:100%;box-sizing:border-box;">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Health Status</label>
+            <input type="text" id="petHealth" placeholder="e.g. Vaccinated" class="form-input" style="width:100%;box-sizing:border-box;">
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="petLocation" placeholder="e.g. Cairo, Egypt" class="form-input" style="width:100%;box-sizing:border-box;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="petDesc" placeholder="Tell adopters about this pet's personality, background, and needs..." class="form-input"></textarea>
+        </div>
+        <button onclick="addPet()" id="addPetBtn">➕ Add Pet</button>
+      </div>
+    </div>
+
+    <!-- REQUESTS TAB -->
+    <div class="tab-content" id="tab-requests">
+      <div id="requestsList"><p style="color:#aaa;">Loading requests...</p></div>
+    </div>
+  </main>
+
+  <footer><p>🐾 &copy; 2025 PetHome. All rights reserved.</p></footer>
+
+  <script src="navbar.js"></script>
+  <script>
+    renderNav('main-nav');
+
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const token = localStorage.getItem('token');
+
+    if (!user || (user.role !== 'shelter' && user.role !== 'rescuer')) {
+      alert('Access denied. Shelter accounts only.');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('welcomeMsg').textContent = `Welcome, ${user.first_name}! Manage your pets and adoption requests here.`;
+
+    const emojiMap = { dog:'🐶', cat:'🐱', rabbit:'🐰', bird:'🐦', small:'🐹' };
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      event.target.classList.add('active');
+      if (tab === 'my-pets') loadMyPets();
+      if (tab === 'requests') loadRequests();
+    }
+
+    // ── LOAD MY PETS ──
+    async function loadMyPets() {
+      const list = document.getElementById('myPetsList');
+      list.innerHTML = '<p style="color:#aaa;">Loading...</p>';
+      try {
+        const res = await fetch('http://localhost:3000/api/pets', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const pets = await res.json();
+        // Filter to only this shelter's pets
+        const myPets = pets.filter(p => p.shelter_id === user.id || p.shelter_name === user.first_name);
+
+        if (myPets.length === 0) {
+          list.innerHTML = '<p style="color:#aaa; text-align:center; padding:30px;">No pets added yet. Use "Add Pet" to get started!</p>';
+          return;
+        }
+
+        list.innerHTML = myPets.map(pet => `
+          <div class="pet-manage-card">
+            <div class="pet-manage-info">
+              <h4>${emojiMap[pet.type] || '🐾'} ${pet.name}</h4>
+              <p>${pet.breed || pet.type} • ${pet.age || '?'} • <strong style="color:${pet.status === 'available' ? '#27ae60' : '#e74c3c'}">${pet.status}</strong></p>
+            </div>
+            <div class="pet-actions">
+              ${pet.status === 'available'
+                ? `<button class="btn-sm btn-adopted" onclick="markAdopted(${pet.id})">✅ Mark Adopted</button>`
+                : `<button class="btn-sm" onclick="markAvailable(${pet.id})" style="background:#e6f9ee;color:#27ae60;">↩️ Mark Available</button>`
+              }
+              <button class="btn-sm btn-delete" onclick="deletePet(${pet.id})">🗑️ Delete</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        list.innerHTML = '<p style="color:#e74c3c;">Failed to load pets.</p>';
+      }
+    }
+
+    // ── ADD PET ──
+    async function addPet() {
+      const btn = document.getElementById('addPetBtn');
+      const successEl = document.getElementById('addSuccess');
+      const errorEl = document.getElementById('addError');
+      successEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      btn.textContent = 'Adding...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('http://localhost:3000/api/pets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({
+            name: document.getElementById('petName').value,
+            type: document.getElementById('petType').value,
+            gender: document.getElementById('petGender').value,
+            breed: document.getElementById('petBreed').value,
+            age: document.getElementById('petAge').value,
+            health_status: document.getElementById('petHealth').value,
+            location: document.getElementById('petLocation').value,
+            description: document.getElementById('petDesc').value,
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        successEl.style.display = 'block';
+        // Clear form
+        ['petName','petBreed','petAge','petHealth','petLocation','petDesc'].forEach(id => document.getElementById(id).value = '');
+      } catch (err) {
+        errorEl.textContent = '❌ ' + err.message;
+        errorEl.style.display = 'block';
+      }
+      btn.textContent = '➕ Add Pet';
+      btn.disabled = false;
+    }
+
+    // ── DELETE PET ──
+    async function deletePet(id) {
+      if (!confirm('Delete this pet listing?')) return;
+      await fetch(`http://localhost:3000/api/pets/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      loadMyPets();
+    }
+
+    // ── MARK ADOPTED ──
+    async function markAdopted(id) {
+      await fetch(`http://localhost:3000/api/pets/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ name: '', breed: '', age: '', health_status: '', description: '', status: 'adopted' })
+      });
+      loadMyPets();
+    }
+
+    async function markAvailable(id) {
+      await fetch(`http://localhost:3000/api/pets/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ name: '', breed: '', age: '', health_status: '', description: '', status: 'available' })
+      });
+      loadMyPets();
+    }
+
+    // ── LOAD REQUESTS ──
+    async function loadRequests() {
+      const list = document.getElementById('requestsList');
+      list.innerHTML = '<p style="color:#aaa;">Loading...</p>';
+      try {
+        const res = await fetch('http://localhost:3000/api/requests', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const requests = await res.json();
+        const pending = requests.filter(r => r.status === 'pending');
+        document.getElementById('pendingBadge').textContent = pending.length > 0 ? `(${pending.length})` : '';
+
+        if (requests.length === 0) {
+          list.innerHTML = '<p style="color:#aaa; text-align:center; padding:30px;">No adoption requests yet.</p>';
+          return;
+        }
+
+        list.innerHTML = requests.map(r => `
+          <div class="request-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+              <div>
+                <strong>🐾 ${r.pet_name}</strong>
+                <span class="req-status ${r.status}" style="margin-left:10px;">${r.status}</span>
+              </div>
+              <span style="color:#999; font-size:0.85rem;">${new Date(r.created_at).toLocaleDateString()}</span>
+            </div>
+            <p style="margin:8px 0 4px; color:#555;">👤 <strong>${r.adopter_name}</strong> — ${r.adopter_email}</p>
+            ${r.message ? `<p style="margin:4px 0; color:#777; font-style:italic;">"${r.message}"</p>` : ''}
+            ${r.status === 'pending' ? `
+              <div class="req-actions">
+                <button class="btn-approve" onclick="updateRequest(${r.id}, 'approved')">✅ Approve</button>
+                <button class="btn-reject" onclick="updateRequest(${r.id}, 'rejected')">❌ Reject</button>
+              </div>` : ''}
+          </div>
+        `).join('');
+      } catch (err) {
+        list.innerHTML = '<p style="color:#e74c3c;">Failed to load requests.</p>';
+      }
+    }
+
+    // ── APPROVE / REJECT REQUEST (Observer fires notification) ──
+    async function updateRequest(id, status) {
+      await fetch(`http://localhost:3000/api/requests/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ status })
+      });
+      // Observer pattern fires on backend → notification sent to adopter automatically
+      loadRequests();
+      loadMyPets();
+    }
+
+    // Load on start
+    loadMyPets();
+  </script>
+</body>
+</html>
