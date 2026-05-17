@@ -1,35 +1,64 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Architects daughter',bold, cursive ;
     margin: 0;
     padding: 0;
-    background-color: #f0f4fd;
+    background-color:#fef5f1;
 }
 
 header {
-    background-color: #1a56db;
-    color: white;
+    background-color:  #1E293B;
+    color: #E2E8F0;
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-
 .logo {
+    font-family: 'Chewy', bold, cursive ;
+    font-weight: 900;
+    font-size: 1.8rem;
+    color: #FFC0CB ; /* خليه باللون البينك عشان ينور في الهيدر الأزرق */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.logo img{
+    width: 60px;
+    height: 60px;
     font-size: 1.5rem;
     font-weight: bold;
     background: none;
     padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+nav {
+    display: flex;
+    gap: 13px; 
 }
 
 nav a {
+    font-family: 'Architects daughter',bold, cursive ;
+
+    background-color:#FFC0CB  ;
     color: white;
+    padding: 8px 20px;         /* مساحة داخلية عشان يبان كصندوق */
+    border-radius: 25px;       /* عشان يكون Rounded (بيضاوي) */
+    text-decoration: none;      /* نشيل الخط اللي تحت اللينك */
+    font-weight: bold;
+    transition: all 0.3s ease; /* أنيميشن ناعم عند الهوفر */
+    margin-left: 0;            /* نلغي المارجن القديم لو موجود */
     text-decoration: none;
     margin-left: 15px;
     font-size: 1rem;
 }
 
 nav a:hover {
-    text-decoration: underline;
+    background-color: #ffffff; /* يقلب أبيض */
+    color:#f7d0e5;            /* والنص يقلب بينك */
+    transform: translateY(-2px); /* حركة خفيفة لفوق */
+    text-decoration: none;      /* نضمن إن مفيش خط يظهر */
 }
 
 
@@ -63,9 +92,9 @@ h1 {
 }
 
 .filter-btn {
-    background: #f0f4fd;
-    color: #1a56db;
-    border: 2px solid #1a56db;
+    background: #1E293B  ;
+    color: #E2E8F0;
+   /* border: 2px solid #1e3a5f;*/
     padding: 10px 22px;
     border-radius: 25px;
     cursor: pointer;
@@ -77,7 +106,7 @@ h1 {
 
 .filter-btn:hover,
 .filter-btn.active {
-    background-color: #1a56db;
+    background-color: #FFC0CB;
     color: white;
 }
 
@@ -86,7 +115,8 @@ h1 {
     display: flex;
     justify-content: center;
     gap: 40px;
-    background: linear-gradient(135deg, #1a56db, #3b82f6);
+    background-color:#1E293B;
+    /*background-image: linear-gradient(135deg, #1a56db, #3b82f6);*/
     padding: 2rem;
     flex-wrap: wrap;
     margin-top: 1rem;
@@ -94,7 +124,7 @@ h1 {
 
 .stat-item {
     text-align: center;
-    color: white;
+    color: #E2E8F0;
 }
 
 .stat-number {
@@ -112,9 +142,11 @@ h1 {
 
 
 .jobs-container {
+    font-family: 'Chewy', bold, cursive ;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
+    
 }
 
 .job-card {
@@ -123,7 +155,7 @@ h1 {
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     transition: transform 0.2s, box-shadow 0.2s;
-    border-left: 5px solid #1a56db;
+    border-left: 5px solid#FFC0CB ;
     text-align: center;
 }
 
@@ -140,7 +172,7 @@ h1 {
 .job-card h3 {
     margin-top: 0;
     margin-bottom: 6px;
-    color: #1a56db;
+    color: #FFC0CB;
     font-size: 1.2rem;
 }
 
@@ -164,7 +196,8 @@ h1 {
 }
 
 button {
-    background-color: #1a56db;
+    font-family: 'Chewy', bold, cursive ;
+    background-color:#FFC0CB ;
     color: white;
     border: none;
     padding: 10px 15px;
@@ -177,19 +210,29 @@ button {
 }
 
 button:hover {
-    background-color: #1341a8;
+    background-color: #f7d0e5; /* يقلب أبيض */
+    color:white;            /* والنص يقلب بينك */
+    transform: translateY(-2px); /* حركة خفيفة لفوق */
+    text-decoration: none;;
 }
 
 
 .PetHome {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: 0;
+    padding: 0 20px;
     min-height: 90vh;
-    background-image: url("images/PetHome.png");
+    /*background-image: url("images/PetHome.png");*/
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-color: #3b82f6; /* fallback if image missing */
+    background-color:  #0F172A; /* fallback if image missing */
     position: relative;
-    color: #fff;
+    color: #E2E8F0;
 }
 
 .PetHome-overlay {
@@ -198,20 +241,25 @@ button:hover {
     background: rgba(0, 0, 0, 0.42);
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .PetHome-center {
+    font-family: 'Architects daughter',bold, cursive ;
+
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
-    text-align: left;
+    align-items: center;
+    text-align: center;
     padding: 0 60px;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
+    z-index: 2;
 }
 
 .PetHome-center h1 {
@@ -219,7 +267,7 @@ button:hover {
     font-weight: bold;
     margin-bottom: 20px;
     line-height: 1.2;
-    color: white;
+    color: #E2E8F0;
     text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
     max-width: 600px;
 }
@@ -228,21 +276,27 @@ button:hover {
     font-size: 1.2rem;
     margin-bottom: 40px;
     max-width: 540px;
-    color: white;
+    color: #E2E8F0;
     text-shadow: 1px 1px 8px rgba(0,0,0,0.5);
 }
 
 .PetHome-search-box {
+    font-family: 'Chewy',bold, cursive ;
+
     display: flex;
-    background: #fff;
+    background:#FFC0CB ;
+    color: #1A2B47;
     border-radius: 50px;
     overflow: hidden;
     max-width: 580px;
     width: 100%;
+    margin: 0 auto;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .PetHome-search-box input {
+    font-family: 'Architects daughter',bold, cursive ;
+
     flex: 1;
     padding: 18px 24px;
     border: none;
@@ -254,7 +308,7 @@ button:hover {
 .PetHome-search-box button {
     padding: 0 36px;
     border: none;
-    background: #1a56db;
+    background: #FFC0CB ;
     color: #fff;
     font-weight: bold;
     font-size: 1rem;
@@ -265,13 +319,17 @@ button:hover {
 }
 
 .PetHome-search-box button:hover {
-    background: #1341a8;
+    background-color:#ffdcef;
+    color:white;            /* والنص يقلب بينك */
+    transform: translateY(-2px); /* حركة خفيفة لفوق */
+    text-decoration: none;;
 }
+
 
 
 .companies-section {
     padding: 40px 20px;
-    background-color: #f0f4fd;
+    background-color: #FFC0CB;
     text-align: center;
 }
 
@@ -296,8 +354,8 @@ button:hover {
 .shelter-badge {
     display: inline-block;
     background: white;
-    border: 2px solid #3b82f6;
-    color: #1341a8;
+    border: 2px solid #FFC0CB;
+    color: #2d3748;
     font-weight: bold;
     font-size: 0.9rem;
     padding: 10px 22px;
@@ -308,7 +366,7 @@ button:hover {
 }
 
 .shelter-badge:hover {
-    background: #1a56db;
+    background: #ffdcef;
     color: white;
     transform: scale(1.05);
 }
@@ -347,12 +405,13 @@ button:hover {
 }
 
 .login-icon {
+    font-family: 'Architects daughter',bold, cursive ;
     font-size: 2.5rem;
     margin-bottom: 8px;
 }
 
 .login-card h2 {
-    color: #1a56db;
+    color: #FFC0CB ;
     font-size: 1.8rem;
     margin-bottom: 8px;
 }
@@ -394,7 +453,7 @@ button:hover {
 .form-group input:focus,
 .form-select:focus {
     outline: none;
-    border-color: #1a56db;
+    border-color: #1e3a5f;
     box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.12);
     background: white;
 }
@@ -420,11 +479,11 @@ button:hover {
 }
 
 .checkbox-group a {
-    color: #1a56db;
+    color: #1e3a5f;
 }
 
 .forgot-link {
-    color: #1a56db;
+    color: #1e3a5f;
     text-decoration: none;
     font-size: 0.9rem;
 }
@@ -435,7 +494,7 @@ button:hover {
 
 .login-btn {
     width: 100%;
-    background-color: #1a56db;
+    background-color: #0F172A;
     color: white;
     border: none;
     padding: 14px;
@@ -458,7 +517,7 @@ button:hover {
 }
 
 .signup-link a {
-    color: #1a56db;
+    color: #FFC0CB ;
     font-weight: bold;
     text-decoration: none;
 }
@@ -471,11 +530,13 @@ button:hover {
 .back-link {
     display: inline-block;
     margin-bottom: 20px;
-    color: #1a56db;
+    color: #FFC0CB ;
     text-decoration: none;
     font-weight: bold;
 }
-
+.back-link:hover {
+    color: #1A2B47; /* يقلب أزرق غامق لما تقفي عليه بالماوس */
+}
 .job-details-container {
     background: white;
     padding: 40px;
@@ -485,13 +546,13 @@ button:hover {
 
 .job-header h1 {
     margin-bottom: 10px;
-    color: #1a56db;
+    color:#FFC0CB ;
 }
 
 .apply-btn {
     display: block;
     width: 100%;
-    background-color: #2a9d5c;
+    background-color: #FFC0CB ;
     color: white;
     text-align: center;
     padding: 15px 0;
@@ -503,7 +564,7 @@ button:hover {
 }
 
 .apply-btn:hover {
-    background-color: #8a7021;
+    background-color: #238a21;
 }
 
 
