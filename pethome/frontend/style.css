@@ -58,9 +58,14 @@ nav a:hover {
     background-color: #ffffff; /* يقلب أبيض */
     color:#f7d0e5;            /* والنص يقلب بينك */
     transform: translateY(-2px); /* حركة خفيفة لفوق */
-    text-decoration: none;      /* نضمن إن مفيش خط يظهر */
+    text-decoration: none;  
+    box-shadow: 0 4px 12px rgba(255,192,203,0.4);   /* نضمن إن مفيش خط يظهر */
 }
-
+nav a.active {
+    background-color: #ffffff;
+    color: #FFC0CB;
+    box-shadow: 0 4px 12px rgba(255,192,203,0.4);
+}
 
 main {
     padding: 2rem;
@@ -364,17 +369,11 @@ button:hover {
     margin: 0 14px;
     white-space: nowrap;
     transition: all 0.3s;
+    pointer-events: none;
+    user-select: none;
 }
 
-.shelter-badge:hover {
-    background: #ffdcef;
-    color: white;
-    transform: scale(1.05);
-}
 
-.companies-carousel:hover .carousel-track {
-    animation-play-state: paused;
-}
 
 @keyframes scroll-left {
     0%   { transform: translateX(0); }

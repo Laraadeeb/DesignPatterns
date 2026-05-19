@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PetHome - My Profile</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     .profile-card { background:white; border-radius:16px; padding:40px; max-width:600px; margin:0 auto; box-shadow:0 4px 20px rgba(0,0,0,0.08); }
     .profile-avatar { width:90px; height:90px; border-radius:50%; background:#FFC0CB; display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin:0 auto 20px; }
@@ -39,12 +40,12 @@
     </div>
 
     <div class="requests-section" id="requestsSection" style="display:none;">
-      <h2 style="color:#1E293B; margin-bottom:16px;">📋 My Adoption Requests</h2>
+      <h2 style="color:#1E293B; margin-bottom:16px;"> My Adoption Requests</h2>
       <div id="requestsList"></div>
     </div>
   </main>
 
-  <footer><p>🐾 &copy; 2025 PetHome. All rights reserved.</p></footer>
+  <footer><p> &copy; 2025 PetHome. All rights reserved.</p></footer>
 
   <script src="navbar.js"></script>
   <script>
@@ -53,10 +54,10 @@
     const user = JSON.parse(localStorage.getItem('user') || 'null');
     if (!user) window.location.href = 'login.html';
 
-    const roleLabel = { adopter: '🐾 Adopter', shelter: '🏠 Shelter', rescuer: '🐕 Rescuer', admin: '⚙️ Admin' };
+    const roleLabel = { adopter: ' Adopter', shelter: ' Shelter', rescuer: ' Rescuer', admin: ' Admin' };
 
     document.getElementById('profileCard').innerHTML = `
-      <div class="profile-avatar">👤</div>
+      <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
       <div class="profile-name">${user.first_name} ${user.last_name}</div>
       <div class="profile-role">${roleLabel[user.role] || user.role}</div>
       <div class="profile-info">
@@ -65,44 +66,12 @@
         <div class="profile-info-row"><span class="info-key">Member since</span><span class="info-val">2025</span></div>
       </div>
       ${user.role === 'shelter' || user.role === 'rescuer'
-        ? `<a href="dashboard.html"><button style="width:100%;margin-bottom:10px;">🏠 Go to Dashboard</button></a>`
+        ? `<a href="dashboard.html"><button style="width:100%;margin-bottom:10px;"> Go to Dashboard</button></a>`
         : ''}
-      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+      <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     `;
 
-    // Load requests for adopters
-    if (user.role === 'adopter') {
-      loadRequests();
-    }
-
-    async function loadRequests() {
-      const token = localStorage.getItem('token');
-      try {
-        const res = await fetch('http://localhost:3000/api/requests', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const requests = await res.json();
-        const section = document.getElementById('requestsSection');
-        const list = document.getElementById('requestsList');
-
-        if (requests.length === 0) {
-          list.innerHTML = '<p style="color:#aaa; text-align:center; padding:20px;">No adoption requests yet. <a href="index.html">Browse pets!</a></p>';
-        } else {
-          list.innerHTML = requests.map(r => `
-            <div class="request-card">
-              <div>
-                <strong>${r.pet_name}</strong>
-                <p style="margin:4px 0 0; color:#888; font-size:0.85rem;">${new Date(r.created_at).toLocaleDateString()}</p>
-              </div>
-              <span class="req-status ${r.status}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span>
-            </div>
-          `).join('');
-        }
-        section.style.display = 'block';
-      } catch (err) {
-        console.error(err);
-      }
-    }
+    
   </script>
 </body>
 </html>

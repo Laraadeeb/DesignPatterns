@@ -31,11 +31,11 @@
     <section class="filter-section">
       <div class="filter-tabs">
         <button class="filter-btn active" data-filter="all">All Pets</button>
-        <button class="filter-btn" data-filter="dog">🐶 Dogs</button>
-        <button class="filter-btn" data-filter="cat">🐱 Cats</button>
-        <button class="filter-btn" data-filter="rabbit">🐰 Rabbits</button>
-        <button class="filter-btn" data-filter="bird">🐦 Birds</button>
-        <button class="filter-btn" data-filter="small">🐹 Small Pets</button>
+        <button class="filter-btn" data-filter="dog"> Dogs</button>
+        <button class="filter-btn" data-filter="cat"> Cats</button>
+        <button class="filter-btn" data-filter="rabbit"> Rabbits</button>
+        <button class="filter-btn" data-filter="bird"> Birds</button>
+        <button class="filter-btn" data-filter="small"> Small Pets</button>
       </div>
     </section>
 
@@ -44,26 +44,26 @@
       <div class="container">
         <div class="companies-carousel">
           <div class="carousel-track">
-            <div class="shelter-badge">🏠 Happy Paws Shelter</div>
-            <div class="shelter-badge">🐾 Cairo Animal Rescue</div>
-            <div class="shelter-badge">❤️ Second Chance Shelter</div>
-            <div class="shelter-badge">🌟 Forever Friends</div>
-            <div class="shelter-badge">🐕 Paws & Claws Egypt</div>
-            <div class="shelter-badge">🐈 Feline Friends Cairo</div>
-            <div class="shelter-badge">🌈 Rainbow Rescue</div>
-            <div class="shelter-badge">🏡 Safe Haven Shelter</div>
-            <div class="shelter-badge">💛 Animal Love Society</div>
-            <div class="shelter-badge">🐾 Adopt Don't Shop</div>
-            <div class="shelter-badge">🏠 Happy Paws Shelter</div>
-            <div class="shelter-badge">🐾 Cairo Animal Rescue</div>
-            <div class="shelter-badge">❤️ Second Chance Shelter</div>
-            <div class="shelter-badge">🌟 Forever Friends</div>
-            <div class="shelter-badge">🐕 Paws & Claws Egypt</div>
-            <div class="shelter-badge">🐈 Feline Friends Cairo</div>
-            <div class="shelter-badge">🌈 Rainbow Rescue</div>
-            <div class="shelter-badge">🏡 Safe Haven Shelter</div>
-            <div class="shelter-badge">💛 Animal Love Society</div>
-            <div class="shelter-badge">🐾 Adopt Don't Shop</div>
+            <div class="shelter-badge"> Happy Paws Shelter</div>
+            <div class="shelter-badge"> Cairo Animal Rescue</div>
+            <div class="shelter-badge"> Second Chance Shelter</div>
+            <div class="shelter-badge"> Forever Friends</div>
+            <div class="shelter-badge"> Paws & Claws Egypt</div>
+            <div class="shelter-badge"> Feline Friends Cairo</div>
+            <div class="shelter-badge"> Rainbow Rescue</div>
+            <div class="shelter-badge"> Safe Haven Shelter</div>
+            <div class="shelter-badge"> Animal Love Society</div>
+            <div class="shelter-badge"> Adopt Don't Shop</div>
+            <div class="shelter-badge"> Happy Paws Shelter</div>
+            <div class="shelter-badge"> Cairo Animal Rescue</div>
+            <div class="shelter-badge"> Second Chance Shelter</div>
+            <div class="shelter-badge"> Forever Friends</div>
+            <div class="shelter-badge"> Paws & Claws Egypt</div>
+            <div class="shelter-badge"> Feline Friends Cairo</div>
+            <div class="shelter-badge"> Rainbow Rescue</div>
+            <div class="shelter-badge"> Safe Haven Shelter</div>
+            <div class="shelter-badge"> Animal Love Society</div>
+            <div class="shelter-badge"> Adopt Don't Shop</div>
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@
   </main>
 
   <footer>
-    <p>🐾 &copy; 2025 PetHome. All rights reserved. Every pet deserves a loving home.</p>
+    <p> &copy; 2025 PetHome. All rights reserved. Every pet deserves a loving home.</p>
   </footer>
 
   <script src="navbar.js"></script>
@@ -108,7 +108,7 @@
         applyFilters();
       } catch (err) {
         document.getElementById('petsContainer').innerHTML =
-          '<p style="text-align:center;color:#e74c3c;padding:40px;grid-column:1/-1;">❌ Could not load pets. Make sure the server is running.</p>';
+          '<p style="text-align:center;color:#e74c3c;padding:40px;grid-column:1/-1;"> Could not load pets. Make sure the server is running.</p>';
       }
     }
 
@@ -140,17 +140,20 @@
 
     function applyFilters() {
       const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const typeNames = { dog:'dog', dogs:'dog', cat:'cat', cats:'cat', rabbit:'rabbit', rabbits:'rabbit', bird:'bird', birds:'bird', small:'small', hamster:'small' };
       const filtered = allPets.filter(pet => {
         const matchFilter = activeFilter === 'all' || pet.type === activeFilter;
+        const searchType = typeNames[search] || '';
         const matchSearch = !search ||
           pet.name.toLowerCase().includes(search) ||
           (pet.breed || '').toLowerCase().includes(search) ||
-          (pet.shelter_name || '').toLowerCase().includes(search);
+          (pet.shelter_name || '').toLowerCase().includes(search) ||
+          (pet.location || '').toLowerCase().includes(search) ||
+          pet.type === searchType;
         return matchFilter && matchSearch;
       });
       renderPets(filtered);
     }
-
     // ── FILTER BUTTONS ──
     document.querySelectorAll('.filter-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {

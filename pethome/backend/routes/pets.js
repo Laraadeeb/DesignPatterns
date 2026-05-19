@@ -24,8 +24,8 @@ router.get('/', (req, res) => {
     params.push(status);
   }
   if (search) {
-    query += ` AND (pets.name LIKE ? OR pets.breed LIKE ?)`;
-    params.push(`%${search}%`, `%${search}%`);
+    query += ` AND (pets.name LIKE ? OR pets.breed LIKE ? OR pets.type LIKE ?)`;
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
   }
 
   query += ` ORDER BY pets.created_at DESC`;

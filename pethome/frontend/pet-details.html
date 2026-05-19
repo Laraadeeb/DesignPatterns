@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PetHome - Pet Details</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     .pet-details-header { text-align:center; margin-bottom:30px; }
     .pet-details-emoji { font-size:5rem; display:block; margin-bottom:10px; }
@@ -35,12 +36,12 @@
   <main>
     <a href="index.html" class="back-link">← Back to Pets</a>
     <div class="job-details-container" id="petDetailsContainer">
-      <p style="text-align:center; padding:40px; color:#aaa;">Loading pet details... 🐾</p>
+      <p style="text-align:center; padding:40px; color:#aaa;">Loading pet details... </p>
     </div>
   </main>
 
   <footer>
-    <p>🐾 &copy; 2025 PetHome. All rights reserved.</p>
+    <p> &copy; 2025 PetHome. All rights reserved.</p>
   </footer>
 
   <script src="navbar.js"></script>
@@ -59,13 +60,13 @@
         const pet = await res.json();
         renderPet(pet);
       } catch (err) {
-        container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">🐾 Pet not found. <a href="index.html">Go back.</a></p>';
+        container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;"> Pet not found. <a href="index.html">Go back.</a></p>';
       }
     }
 
     function renderPet(pet) {
       document.title = 'PetHome - ' + pet.name;
-      const emoji = emojiMap[pet.type] || '🐾';
+      const emoji = emojiMap[pet.type] ;
 
       // تحقق من الـ login state هنا مباشرة
       const token = localStorage.getItem('token');
@@ -85,7 +86,7 @@
         // مش logged in
         adoptSection = `
           <div class="adopt-section">
-            <p>Ready to give <strong>${pet.name}</strong> a forever home? 🏠</p>
+            <p>Ready to give <strong>${pet.name}</strong> a forever home? </p>
             <p style="color:#e74c3c;font-weight:bold;">Please login first to send an adoption request.</p>
             <button onclick="window.location.href='login.html'" style="width:auto;padding:12px 30px;">Login to Adopt</button>
           </div>`;
@@ -98,17 +99,17 @@
           </div>`;
 
       } else {
-        // adopter logged in ✅
+        // adopter logged in 
         adoptSection = `
           <div class="adopt-section">
-            <p>Ready to give <strong>${pet.name}</strong> a forever home? 🏠</p>
+            <p>Ready to give <strong>${pet.name}</strong> a forever home? </p>
             <textarea class="adopt-textarea" id="adoptMsg"
               placeholder="Tell the shelter a bit about yourself and why you'd like to adopt ${pet.name}..."></textarea>
             <button id="adoptBtn" onclick="sendRequest(${pet.id})" style="width:auto;padding:12px 36px;">
-              🐾 Request to Adopt ${pet.name}
+               Request to Adopt ${pet.name}
             </button>
             <div class="success-msg" id="successMsg">
-              🎉 Your adoption request has been sent! The shelter will contact you soon.
+               Your adoption request has been sent! The shelter will contact you soon.
             </div>
             <div class="error-msg-box" id="errorMsgBox"></div>
           </div>`;
@@ -121,7 +122,7 @@
           : `<span class="pet-details-emoji">${emoji}</span>`}
           <h1>${pet.name}</h1>
           <span class="status-badge status-${pet.status}">
-            ${pet.status === 'available' ? '✅ Available for Adoption' : '❤️ Already Adopted'}
+            ${pet.status === 'available' ? '<i class="fa-solid fa-circle-check"></i> Available for Adoption' : '<i class="fa-solid fa-heart"></i> Already Adopted'}
           </span>
         </div>
         <hr>
@@ -168,7 +169,7 @@
       } catch (err) {
         errorBox.textContent = '❌ ' + err.message;
         errorBox.style.display = 'block';
-        btn.textContent = '🐾 Request to Adopt';
+        btn.textContent = ' Request to Adopt';
         btn.disabled = false;
       }
     }

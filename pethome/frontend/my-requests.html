@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetHome - My Requests</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .requests-wrapper {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .page-title {
+      color: #1E293B;
+      font-size: 1.6rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+    .page-sub {
+      color: #aaa;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+    .request-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-left: 4px solid #FFC0CB;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .req-left { display: flex; align-items: center; gap: 14px; }
+    .req-emoji { font-size: 2rem; }
+    .req-pet-name {
+      font-weight: bold;
+      color: #1E293B;
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+    .req-date { color: #aaa; font-size: 0.82rem; }
+    .req-msg { color: #777; font-size: 0.85rem; font-style: italic; margin-top: 4px; }
+    .status-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .status-pending  { background: #fff3cd; color: #856404; }
+    .status-approved { background: #e6f9ee; color: #27ae60; }
+    .status-rejected { background: #ffeaea; color: #e74c3c; }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #aaa;
+    }
+    .empty-state .empty-icon { font-size: 3.5rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 1rem; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><img src="logo.png" alt="logo"> PetHome</div>
+    <nav id="main-nav"></nav>
+  </header>
+
+  <main>
+    <div class="requests-wrapper">
+      <a href="profile.html" class="back-link">← Back to Profile</a>
+
+      <div class="page-title"> My Adoption Requests</div>
+      <p class="page-sub">Track the status of your adoption requests here.</p>
+
+      <div id="requestsList">
+        <p style="color:#aaa; text-align:center; padding:40px;">Loading requests... 🐾</p>
+      </div>
+    </div>
+  </main>
+
+  <footer><p>🐾 &copy; 2025 PetHome. All rights reserved.</p></footer>
+
+  <script src="navbar.js"></script>
+  <script>
+    renderNav('main-nav');
+
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const token = localStorage.getItem('token');
+
+    if (!user || !token) window.location.href = 'login.html';
+    if (user && user.role !== 'adopter') window.location.href = 'index.html';
+
+    const emojiMap = { dog:'🐶', cat:'🐱', rabbit:'🐰', bird:'🐦', small:'🐹' };
+
+    async function loadRequests() {
+      const list = document.getElementById('requestsList');
+      try {
+        const res = await fetch('http://localhost:3000/api/requests', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const requests = await res.json();
+
+        if (!Array.isArray(requests) || requests.length === 0) {
+          list.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">🐾</div>
+              <p>You haven't sent any adoption requests yet.</p>
+              <a href="index.html"><button style="width:auto; padding:12px 30px;">Browse Pets</button></a>
+            </div>`;
+          return;
+        }
+
+        list.innerHTML = requests.map(r => `
+          <div class="request-card">
+            <div class="req-left">
+              <div class="req-emoji">${emojiMap[r.pet_type]}</div>
+              <div>
+                <div class="req-pet-name">${r.pet_name}</div>
+                <div class="req-date"> ${new Date(r.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}</div>
+                ${r.message ? `<div class="req-msg">"${r.message}"</div>` : ''}
+              </div>
+            </div>
+            <span class="status-badge status-${r.status}">
+              ${r.status === 'pending'  ? '<i class="fa-solid fa-hourglass"></i> Pending'  : ''}
+              ${r.status === 'approved' ? '<i class="fa-solid fa-circle-check"></i> Approved' : ''}
+              ${r.status === 'rejected' ? '<i class="fa-solid fa-circle-xmark"></i> Rejected' : ''}
+            </span>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        list.innerHTML = '<p style="color:#e74c3c; text-align:center;">Failed to load requests. Make sure the server is running.</p>';
+      }
+    }
+
+    loadRequests();
+  </script>
+</body>
+</html>

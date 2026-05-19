@@ -90,7 +90,7 @@ class DatabaseConnection {
           FOREIGN KEY (user_id) REFERENCES users(id)
         )
       `);
-
+      this.db.run(`ALTER TABLE pets ADD COLUMN image_url TEXT`, () => {});
       console.log('✅ All tables ready');
     });
   }
